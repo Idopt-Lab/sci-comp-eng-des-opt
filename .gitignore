@@ -12,3 +12,8 @@ reports/
 # Jupyter / editor local state
 .ipynb_checkpoints/
 .vscode/
+
+# Cost references for ex_04_cost: a third-party textbook workbook, a paywalled
+# paper, and two student senior-design programmes.  Kept locally, cited in the
+# example, never redistributed.  See references/NOTICE.md.
+references/AircraftCost/
