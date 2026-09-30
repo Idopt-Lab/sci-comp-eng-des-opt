@@ -63,7 +63,7 @@ arranged. Chapter numbers refer to Martins & Ning.
 
 | # | Week of | Topic | Project milestone | Reference & repo |
 |---|---|---|---|---|
-| 1 | Aug 31 | Course kickoff; **Design Structure Matrices** — N2 and XDSM; scoping your project; tour of the worked examples | Draft **project problem statement** (objective, design variables, constraints) | Ch. 1–2, 13.2–13.3; [Lesson 1 — DSM](lessons/lesson_01_dsm/docs/lesson_01_dsm.md); [ASW app](#quickstart-run-the-asw-streamlit-example), [ex_01](src/aircraft_sizing/examples/ex_01_asw/docs/ex_01_asw_sizing.md), [ex_02](src/aircraft_sizing/examples/ex_02_electrified_aircraft/docs/ex_02_electrified_aircraft.md), [ex_03](src/aircraft_sizing/examples/ex_03_e19_hybrid_electric/docs/ex_03_electrified_aircraft_sizing.md) |
+| 1 | Aug 31 | Course kickoff; **Design Structure Matrices** — N2 and XDSM; scoping your project; tour of the worked examples | Draft **project problem statement** (objective, design variables, constraints) | Ch. 1–2, 13.2–13.3; [Lesson 1 — DSM](lessons/lesson_01_dsm/docs/lesson_01_dsm.md); [ASW app](#quickstart-run-the-asw-streamlit-example), [ex_01](src/aircraft_sizing/examples/ex_01_asw/docs/ex_01_asw_sizing.md), [ex_02](src/aircraft_sizing/examples/ex_02_electrified_aircraft/docs/ex_02_electrified_aircraft.md), [ex_03](src/aircraft_sizing/examples/ex_03_e19_hybrid_electric/docs/ex_03_electrified_aircraft_sizing.md), [ex_04](src/aircraft_sizing/examples/ex_04_cost/docs/ex_04_cost.md) |
 | 2 | Sep 14 | **Iterative methods** — fixed-point (Gauss–Seidel), Newton, Broyden; convergence and cost | **N2 diagram** of your MDO problem | Ch. 3, App. B–C; [Lesson 2 — Iterative methods](lessons/lesson_02_iterative_methods/asw/docs/lesson_02_iterative_methods.md) |
 | 3 | Sep 28 | **Gradient-based optimization & computing derivatives** — line search, BFGS, SQP; finite difference, complex step, JAX AD, adjoint | First runnable **JAX + OpenMDAO** script (agentic AI workflow) | Ch. 4–6; Lesson 2 (JAX vs finite difference) |
 | 4 | Oct 12 | **Mid-semester presentations** — project-idea pitch | **Pitch**: problem statement, N2, and planned approach (incl. uncertainty sources / k-factors) | — |
@@ -121,6 +121,17 @@ python -m streamlit run apps/streamlit/app.py
 
 Streamlit prints a **Local URL** (default <http://localhost:8501>) and usually opens it in your browser automatically. If it doesn't, open that URL yourself. Press `Ctrl+C` in the terminal to stop the server.
 
+There is a second app for the cost example (ex_04), launched the same way:
+
+```bash
+python -m streamlit run apps/streamlit/cost_app.py
+```
+
+It opens in military mode with the F-16A baseline and carries the cost trade studies —
+learning curve, tornado charts, design-to-cost contours, materials and signature,
+software, and acquisition-versus-ownership. See the
+[teaching guide](src/aircraft_sizing/examples/ex_04_cost/docs/ex_04_cost_teaching_guide.md).
+
 ### 5. Use the app
 
 The page has a **control sidebar on the left** and **results on the right**. Results recompute only when you click **Recompute** — so you can move several controls, then apply them all at once.
@@ -172,6 +183,9 @@ python -m pip install -e .
   - [Electric drive train (EDT) SOA energy](src/aircraft_sizing/examples/ex_02_electrified_aircraft/docs/03_edt_soa_energy.md)
   - [Reduced-order battery sizing](src/aircraft_sizing/examples/ex_02_electrified_aircraft/docs/04_battery_sizing.md)
 - **ex_03 —** [Electrified aircraft (E-19) sizing narrative](src/aircraft_sizing/examples/ex_03_e19_hybrid_electric/docs/ex_03_electrified_aircraft_sizing.md) (hybrid-electric, from de Vries et al., AIAA 2026-4690)
+- **ex_04 —** [Aircraft cost estimation](src/aircraft_sizing/examples/ex_04_cost/docs/ex_04_cost.md) — DAPCA IV, Roskam Part VIII, COCOMO II and a commercial direct-operating-cost model, with interactive trade studies:
+  - [Cost model map](src/aircraft_sizing/examples/ex_04_cost/docs/cost_model_map.md) — every equation with its source
+  - [Teaching guide](src/aircraft_sizing/examples/ex_04_cost/docs/ex_04_cost_teaching_guide.md) — the in-class script
 
 ### Course lessons
 
