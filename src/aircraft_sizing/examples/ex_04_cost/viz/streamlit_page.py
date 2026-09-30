@@ -44,6 +44,7 @@ _MILITARY_BASELINE_KEY = "cost_military_baseline"
 _COMMERCIAL_BASELINE_KEY = "cost_commercial_baseline"
 _SCENARIO_KEY = "cost_commercial_scenario"
 _STAGE_KEY = "cost_commercial_stage"
+_COMMERCIAL_OVERRIDES_KEY = "cost_commercial_overrides"
 
 MILITARY_MODE = "Military fighter"
 COMMERCIAL_MODE = "Passenger transport"
@@ -773,10 +774,12 @@ def render() -> None:
         inputs = st.session_state[_MILITARY_KEY]
         name, signature_level, engines, recompute, reset, values = _military_sidebar(inputs, loaded)
 
+        if reset:
+            # The baseline's own signature level and engine count, not the widgets'.
+            st.session_state[_MILITARY_KEY] = MILITARY_AIRCRAFT[name]["dapca"]
+            st.rerun()
         try:
-            if reset:
-                inputs = MILITARY_AIRCRAFT[name]["dapca"]
-            elif recompute:
+            if recompute:
                 inputs = replace(inputs, **values)
             inputs = replace(
                 inputs,
@@ -795,17 +798,30 @@ def render() -> None:
         selected = st.session_state.get(_COMMERCIAL_BASELINE_KEY, loaded)
         if selected in COMMERCIAL_BASELINES:
             loaded = selected
+        if st.session_state.get(_LOADED_COMMERCIAL_KEY) != loaded:
+            st.session_state.pop(_COMMERCIAL_OVERRIDES_KEY, None)
         st.session_state[_LOADED_COMMERCIAL_KEY] = loaded
-        # Seed the sidebar from the mission being solved.
+        # Edits are kept as overrides on the baseline, so they survive reruns while
+        # the untouched fields still follow the stage length and scenario.
+        overrides = st.session_state.get(_COMMERCIAL_OVERRIDES_KEY, {})
         seed_stage = float(st.session_state.get(_STAGE_KEY, 500.0))
         seed_scenario = st.session_state.get(_SCENARIO_KEY, next(iter(SCENARIOS)))
         name, scenario, stage, recompute, reset, values = _commercial_sidebar(
-            commercial_inputs_for(loaded, seed_stage, seed_scenario), loaded
+            replace(commercial_inputs_for(loaded, seed_stage, seed_scenario), **overrides),
+            loaded,
         )
+        if reset:
+            st.session_state.pop(_COMMERCIAL_OVERRIDES_KEY, None)
+            st.rerun()
         try:
-            inputs = commercial_inputs_for(name, float(stage), scenario)
-            if recompute and not reset:
-                inputs = replace(inputs, **values)
+            baseline = commercial_inputs_for(name, float(stage), scenario)
+            if recompute:
+                overrides = {
+                    field: value for field, value in values.items()
+                    if value != float(getattr(baseline, field))
+                }
+            inputs = replace(baseline, **overrides)
+            st.session_state[_COMMERCIAL_OVERRIDES_KEY] = overrides
             _render_commercial(inputs, name, scenario, stage)
         except InputError as error:
             st.error(f"{error}  Adjust the sidebar and press Recompute.")
