@@ -29,6 +29,19 @@ active (`conda activate eng-des-opt-course`; see the top-level [README](../READM
    # -> outputs/solver_comparison.md, outputs/convergence.png
    ```
 
+3. **[Gradient-based optimization & computing derivatives](lesson_03_gradient_based_optimization/docs/lesson_03_gradient_based_optimization.md)**
+   — wrap the Sellar MDA in SLSQP (KKT, iteration vs evaluation counts); analytic vs
+   finite-difference vs complex-step vs JAX derivatives; automatic differentiation
+   from scratch; and the ASW sizing loop recast as an optimization.
+   ```bash
+   python lessons/lesson_03_gradient_based_optimization/sellar/01_sellar_optimization.py
+   python lessons/lesson_03_gradient_based_optimization/sellar/02_sellar_derivatives.py
+   python lessons/lesson_03_gradient_based_optimization/autodiff/03_computational_graph.py
+   python lessons/lesson_03_gradient_based_optimization/asw/04_asw_as_optimization.py
+   python lessons/lesson_03_gradient_based_optimization/c172/05_c172_trim.py  # capstone: ex_05 C172 trim, 5 backends
+   python lessons/lesson_03_gradient_based_optimization/generate_xdsm.py  # -> outputs/*.pdf/.png
+   ```
+
 Each lesson has a `docs/` narrative, runnable scripts, and committed `outputs/` so
 the figures render on GitHub without re-running anything. Rendering the XDSM to
 PDF/PNG additionally needs `pdflatex` and `pdftoppm` on PATH.

@@ -227,6 +227,29 @@ class Structures(JaxExplicitComponent):
         return jnp.stack([we])
 
 
+class SizingResidual(JaxExplicitComponent):
+    """Explicit form of the sizing residual, for the *optimization* formulations.
+
+    ``R = WTO*(1 - Wf/WTO - We/WTO) - W_fixed``.  Where the implicit ``Sizing``
+    component lets a solver drive ``R`` to zero by owning ``W_TO`` as a state, this
+    exposes ``R`` as an ordinary output so an optimizer can own ``W_TO`` as a design
+    variable -- either minimizing ``W_TO`` subject to ``R >= 0`` or minimizing
+    ``(R/ref)^2``.  Same JAX/FD partials machinery as every other discipline.
+    """
+
+    input_names = (
+        "takeoff_gross_weight",
+        "fuel_weight_fraction",
+        "empty_weight_fraction",
+        "fixed_weight",
+    )
+    output_names = ("sizing_residual",)
+
+    @staticmethod
+    def primal_fn(x):
+        return jnp.stack([D.sizing_residual(x[0], x[1], x[2], x[3])])
+
+
 # JIT the sizing residual and its gradient once (Newton re-linearizes every step).
 _sizing_residual = jax.jit(D.sizing_residual)
 _sizing_grads = jax.jit(jax.grad(D.sizing_residual, argnums=(0, 1, 2, 3)))

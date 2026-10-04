@@ -1,0 +1,144 @@
+
+%%% Preamble Requirements %%%
+% \usepackage{geometry}
+% \usepackage{amsfonts}
+% \usepackage{amsmath}
+% \usepackage{amssymb}
+% \usepackage{tikz}
+
+% Optional packages such as sfmath set through python interface
+% \usepackage{}
+
+% \usetikzlibrary{arrows,chains,positioning,scopes,shapes.geometric,shapes.misc,shadows}
+
+%%% End Preamble Requirements %%%
+
+\input{"C:/Users/darsh/miniconda3/envs/eng-des-opt-course/Lib/site-packages/pyxdsm/diagram_styles"}
+\begin{tikzpicture}
+
+\matrix[MatrixSetup]{
+%Row 0
+\node [DataIO] (output_opt) {$\theta_0,\ \delta_{e,0},\ \omega_0$};&
+\node [DataIO] (output_aero) {$M,\ S,\ \bar c$};&
+\node [DataIO] (output_prop) {$M,\ R,\ \rho$};&
+\node [DataIO] (output_gravity) {$m,\ g$};&
+&
+&
+&
+\\
+%Row 1
+\node [Optimization] (opt) {$\begin{array}{c}\text{Optimizer} \\ \text{(SLSQP)}\end{array}$};&
+\node [DataInter] (opt-aero) {$\theta,\ \delta_e$};&
+\node [DataInter] (opt-prop) {$\omega$};&
+\node [DataInter] (opt-gravity) {$\theta$};&
+&
+&
+&
+\node [DataIO] (right_output_opt) {$\theta^*,\ \delta_e^*,\ \omega^*$};\\
+%Row 2
+&
+\node [Function] (aero) {$\begin{array}{c}\text{Aerodynamics}\end{array}$};&
+&
+&
+\node [DataInter] (aero-eom) {$F_a,\ M_a$};&
+&
+&
+\\
+%Row 3
+&
+&
+\node [Function] (prop) {$\begin{array}{c}\text{Propulsion}\end{array}$};&
+&
+\node [DataInter] (prop-eom) {$F_p$};&
+&
+&
+\\
+%Row 4
+&
+&
+&
+\node [Function] (gravity) {$\begin{array}{c}\text{Gravity}\end{array}$};&
+\node [DataInter] (gravity-eom) {$F_i$};&
+&
+&
+\\
+%Row 5
+&
+&
+&
+&
+\node [Function] (eom) {$\begin{array}{c}\text{6-DOF EOM}\end{array}$};&
+\node [DataInter] (eom-obj) {$\dot u, \dot w, \dot q$};&
+&
+\\
+%Row 6
+\node [DataInter] (obj-opt) {$f,\ \nabla f$};&
+&
+&
+&
+&
+\node [Function] (obj) {$\begin{array}{c}\text{Objective} \\ \tfrac{1}{2}\|\tilde r\|^2\end{array}$};&
+&
+\\
+%Row 7
+&
+&
+&
+&
+&
+&
+&
+\\
+};
+
+% XDSM process chains
+{ [start chain=process]
+ \begin{pgfonlayer}{process} 
+\chainin (opt);
+\chainin (aero) [join=by ProcessHVA];
+\chainin (eom) [join=by ProcessHVA];
+\chainin (obj) [join=by ProcessHVA];
+\chainin (opt) [join=by ProcessHVA];
+\end{pgfonlayer}
+}{ [start chain=process]
+ \begin{pgfonlayer}{process} 
+\chainin (opt);
+\chainin (prop) [join=by ProcessHVA];
+\chainin (eom) [join=by ProcessHVA];
+\end{pgfonlayer}
+}{ [start chain=process]
+ \begin{pgfonlayer}{process} 
+\chainin (opt);
+\chainin (gravity) [join=by ProcessHVA];
+\chainin (eom) [join=by ProcessHVA];
+\end{pgfonlayer}
+}
+
+\begin{pgfonlayer}{data}
+\path
+% Horizontal edges
+(opt) edge [DataLine] (opt-aero)
+(opt) edge [DataLine] (opt-prop)
+(opt) edge [DataLine] (opt-gravity)
+(aero) edge [DataLine] (aero-eom)
+(prop) edge [DataLine] (prop-eom)
+(gravity) edge [DataLine] (gravity-eom)
+(eom) edge [DataLine] (eom-obj)
+(obj) edge [DataLine] (obj-opt)
+(opt) edge [DataLine] (right_output_opt)
+% Vertical edges
+(opt-aero) edge [DataLine] (aero)
+(opt-prop) edge [DataLine] (prop)
+(opt-gravity) edge [DataLine] (gravity)
+(aero-eom) edge [DataLine] (eom)
+(prop-eom) edge [DataLine] (eom)
+(gravity-eom) edge [DataLine] (eom)
+(eom-obj) edge [DataLine] (obj)
+(obj-opt) edge [DataLine] (opt)
+(opt) edge [DataLine] (output_opt)
+(aero) edge [DataLine] (output_aero)
+(prop) edge [DataLine] (output_prop)
+(gravity) edge [DataLine] (output_gravity);
+\end{pgfonlayer}
+
+\end{tikzpicture}

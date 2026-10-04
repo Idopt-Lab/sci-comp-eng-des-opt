@@ -6,4 +6,7 @@ dependencies:
   - python=3.12
   - pip
   - pip:
-      - "-e ."
+      # Core + all derivative backends (CasADi, Warp, pymoo, pandas) and the
+      # CSDL-alpha backend for the ex_05 C172 trim example. Warp reaches an NVIDIA
+      # GPU on native Windows via its bundled CUDA runtime; JAX stays CPU on Windows.
+      - "-e .[trim,csdl]"

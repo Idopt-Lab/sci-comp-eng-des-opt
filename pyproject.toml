@@ -18,6 +18,23 @@ dependencies = [
     "streamlit",
 ]
 
+[project.optional-dependencies]
+# Extra derivative backends and the GA for the ex_05 C172 trim example.
+# warp-lang's wheel ships the CUDA runtime + kernel toolchain, so it reaches an
+# NVIDIA GPU on native Windows with just the driver (no CUDA toolkit / nvcc).
+# Do NOT add jax[cuda]/jaxlib-cuda here -- unsupported on Windows; JAX stays CPU.
+trim = [
+    "casadi>=3.8.1",
+    "warp-lang>=1.17",
+    "pymoo>=0.6.2",
+    "pandas",
+]
+# CSDL-alpha backend. Direct VCS reference (not published to PyPI); installed from
+# source for editable/dev installs only.
+csdl = [
+    "csdl_alpha @ git+https://github.com/LSDOlab/CSDL_alpha.git",
+]
+
 [tool.setuptools]
 package-dir = {"" = "src"}
 include-package-data = true
@@ -33,4 +50,5 @@ aircraft_sizing = [
     "examples/**/*.pptx",
     "examples/**/*.tex",
     "examples/**/*.tikz",
+    "examples/**/*.csv",
 ]
