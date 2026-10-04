@@ -21,10 +21,15 @@ from aircraft_sizing.examples.ex_01_asw.methods.config import (
     segment_ratios,
     solve,
 )
+from aircraft_sizing.examples.ex_01_asw.methods.components import CallCounter
 from aircraft_sizing.examples.ex_01_asw.methods.group import (
+    OPT_FORMULATIONS,
     SOLVER_CHOICES,
+    build_asw_optimization_problem,
     build_asw_problem,
 )
+
+import numpy as np
 
 BASELINE_TOGW_LB = 57_615.87
 
@@ -279,6 +284,44 @@ class ValidationTests(unittest.TestCase):
     def test_out_of_range_segment_ratio_raises(self) -> None:
         with self.assertRaises(ValueError):
             ASWSizingInputs(climb_weight_ratio=1.5)
+
+
+class OptimizationFormulationTests(unittest.TestCase):
+    """The sizing loop recast as an optimization (Lesson 3) recovers the baseline W_TO."""
+
+    def test_both_formulations_and_derivs_reach_baseline(self) -> None:
+        inputs = ASWSizingInputs.baseline()
+        for formulation in OPT_FORMULATIONS:
+            for deriv in ("jax", "fd"):
+                with self.subTest(formulation=formulation, deriv=deriv):
+                    counter = CallCounter()
+                    prob = build_asw_optimization_problem(
+                        inputs.params(), inputs.input_values(),
+                        formulation=formulation, deriv=deriv, counter=counter,
+                    )
+                    with np.errstate(divide="ignore", invalid="ignore"):
+                        prob.run_driver()
+                    w_to = float(prob.get_val("dv.takeoff_gross_weight")[0])
+                    self.assertAlmostEqual(w_to, BASELINE_TOGW_LB, delta=1e-2)
+                    # The optimizer actually drove the discipline evaluations.
+                    self.assertGreater(counter.total("compute"), 0)
+
+    def test_min_weight_satisfies_residual_constraint(self) -> None:
+        inputs = ASWSizingInputs.baseline()
+        prob = build_asw_optimization_problem(
+            inputs.params(), inputs.input_values(), formulation="min_weight", deriv="jax"
+        )
+        with np.errstate(divide="ignore", invalid="ignore"):
+            prob.run_driver()
+        residual = float(prob.get_val("sizing.sizing_residual")[0])
+        self.assertGreaterEqual(residual, -1e-6)  # R >= 0 constraint honored
+
+    def test_unknown_formulation_raises(self) -> None:
+        inputs = ASWSizingInputs.baseline()
+        with self.assertRaises(ValueError):
+            build_asw_optimization_problem(
+                inputs.params(), inputs.input_values(), formulation="not_a_formulation"
+            )
 
 
 if __name__ == "__main__":

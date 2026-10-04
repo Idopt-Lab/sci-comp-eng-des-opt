@@ -65,10 +65,10 @@ arranged. Chapter numbers refer to Martins & Ning.
 |---|---|---|---|---|
 | 1 | Aug 31 | Course kickoff; **Design Structure Matrices** — N2 and XDSM; scoping your project; tour of the worked examples | Draft **project problem statement** (objective, design variables, constraints) | Ch. 1–2, 13.2–13.3; [Lesson 1 — DSM](lessons/lesson_01_dsm/docs/lesson_01_dsm.md); [ASW app](#quickstart-run-the-asw-streamlit-example), [ex_01](src/aircraft_sizing/examples/ex_01_asw/docs/ex_01_asw_sizing.md), [ex_02](src/aircraft_sizing/examples/ex_02_electrified_aircraft/docs/ex_02_electrified_aircraft.md), [ex_03](src/aircraft_sizing/examples/ex_03_e19_hybrid_electric/docs/ex_03_electrified_aircraft_sizing.md) |
 | 2 | Sep 14 | **Iterative methods** — fixed-point (Gauss–Seidel), Newton, Broyden; convergence and cost | **N2 diagram** of your MDO problem | Ch. 3, App. B–C; [Lesson 2 — Iterative methods](lessons/lesson_02_iterative_methods/asw/docs/lesson_02_iterative_methods.md) |
-| 3 | Sep 28 | **Gradient-based optimization & computing derivatives** — line search, BFGS, SQP; finite difference, complex step, JAX AD, adjoint | First runnable **JAX + OpenMDAO** script (agentic AI workflow) | Ch. 4–6; Lesson 2 (JAX vs finite difference) |
+| 3 | Sep 28 | **Gradient-based optimization & computing derivatives** — line search, BFGS, SQP; finite difference, complex step, JAX AD, adjoint | First runnable **JAX + OpenMDAO** script (agentic AI workflow) | Ch. 4–6; [Lesson 3 — Gradient-based optimization](lessons/lesson_03_gradient_based_optimization/docs/lesson_03_gradient_based_optimization.md); [ex_05 — C172 trim](src/aircraft_sizing/examples/ex_05_c172_trim/docs/ex_05_c172_trim.md) |
 | 4 | Oct 12 | **Mid-semester presentations** — project-idea pitch | **Pitch**: problem statement, N2, and planned approach (incl. uncertainty sources / k-factors) | — |
 | 5 | Oct 26 | **Surrogate-based optimization & optimization under uncertainty** — surrogate modeling with SMT; UQ with UM-Bridge; robust / reliability-based design | Design of experiments + **data set on VT-ARC HPC** | Ch. 10, 12 |
-| 6 | Nov 9 | **Gradient-free & multi-objective optimization** — Nelder–Mead, genetic algorithms, particle swarm; Pareto fronts, weighted-sum and ε-constraint | Fitted **SMT surrogate** + **UM-Bridge UQ results** | Ch. 7, 9 |
+| 6 | Nov 9 | **Gradient-free & multi-objective optimization** — Nelder–Mead, genetic algorithms, particle swarm; Pareto fronts, weighted-sum and ε-constraint | Fitted **SMT surrogate** + **UM-Bridge UQ results** | Ch. 7, 9; [ex_05 — C172 trim](src/aircraft_sizing/examples/ex_05_c172_trim/docs/ex_05_c172_trim.md) (pymoo GA solver) |
 | 7 | Dec 7 | **Final presentations** | **Final report + presentation** | — |
 
 ## Quickstart: run the ASW Streamlit example
@@ -103,7 +103,7 @@ From the repository root:
 conda env create -f environment.yml --yes
 ```
 
-`environment.yml` creates an environment named **`eng-des-opt-course`** (Python 3.12) and installs this package in editable mode (`-e .`), so the environment picks up local source edits automatically.
+`environment.yml` creates an environment named **`eng-des-opt-course`** (Python 3.12) and installs this package in editable mode with the extra derivative backends for the ex_05 C172 trim example (`-e .[trim,csdl]` — CasADi, Warp, pymoo, pandas, and CSDL-alpha), so the environment picks up local source edits automatically. Warp reaches an NVIDIA GPU on native Windows through its bundled CUDA runtime (just the driver is needed); JAX stays on CPU on Windows. To add the extras to an existing install: `python -m pip install -e ".[trim,csdl]"`.
 
 ### 3. Activate the environment
 
@@ -172,11 +172,13 @@ python -m pip install -e .
   - [Electric drive train (EDT) SOA energy](src/aircraft_sizing/examples/ex_02_electrified_aircraft/docs/03_edt_soa_energy.md)
   - [Reduced-order battery sizing](src/aircraft_sizing/examples/ex_02_electrified_aircraft/docs/04_battery_sizing.md)
 - **ex_03 —** [Electrified aircraft (E-19) sizing narrative](src/aircraft_sizing/examples/ex_03_e19_hybrid_electric/docs/ex_03_electrified_aircraft_sizing.md) (hybrid-electric, from de Vries et al., AIAA 2026-4690)
+- **ex_05 —** [Cessna-172 six-DOF trim as optimization](src/aircraft_sizing/examples/ex_05_c172_trim/docs/ex_05_c172_trim.md) (five derivative backends — numpy/JAX/CasADi/CSDL/Warp — plus a pymoo GA)
 
 ### Course lessons
 
 - [Lesson 1 — Design Structure Matrices (DSM), N2, and XDSM](lessons/lesson_01_dsm/docs/lesson_01_dsm.md)
 - [Lesson 2 — Iterative methods: fixed-point vs Newton vs Broyden, gradients vs finite difference](lessons/lesson_02_iterative_methods/asw/docs/lesson_02_iterative_methods.md)
+- [Lesson 3 — Gradient-based optimization & computing derivatives (analytic / FD / complex-step / AD)](lessons/lesson_03_gradient_based_optimization/docs/lesson_03_gradient_based_optimization.md)
 
 ### Reference notes
 
