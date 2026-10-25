@@ -16,6 +16,8 @@ dependencies = [
     "matplotlib",
     "pyXDSM",
     "streamlit",
+    "smt",       # Surrogate Modeling Toolbox (DoE + surrogates), lesson_04
+    "scipy",
 ]
 
 [project.optional-dependencies]
@@ -33,6 +35,12 @@ trim = [
 # source for editable/dev installs only.
 csdl = [
     "csdl_alpha @ git+https://github.com/LSDOlab/CSDL_alpha.git",
+]
+# NASA's UQPCE (polynomial chaos uncertainty quantification) for lesson_05. Not on
+# PyPI; installed from source. Pure numpy/scipy/sympy/pyyaml + openmdao (no MPI).
+uq = [
+    "uqpce @ git+https://github.com/nasa/UQPCE.git",
+    "pyyaml",
 ]
 
 [tool.setuptools]

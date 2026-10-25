@@ -1,0 +1,41 @@
+# UQPCE input file for the uncertain Sellar problem (Lesson 5).
+#
+# Four aleatory (random) parameters multiply terms in the Sellar disciplines and
+# objective (see sellar_uncertain.py). Every factor has MEAN 1, so at the mean
+# values the model is exactly the canonical Sellar problem from Lessons 2-4
+# (deterministic optimum f* = 3.183394). Each entry gives the OpenMDAO input name,
+# the distribution family, and its parameters.
+#
+# Settings controls the polynomial-chaos run: `order` is the PCE polynomial order
+# and `significance` sets the (1 - significance) confidence interval (0.05 -> 95%).
+
+Variable 0:
+  name: a0
+  distribution: normal
+  mean: 1.0
+  stdev: 0.06
+  type: aleatory
+Variable 1:
+  name: a1
+  distribution: uniform
+  interval_low: 0.9
+  interval_high: 1.1
+  type: aleatory
+Variable 2:
+  name: a2
+  distribution: normal
+  mean: 1.0
+  stdev: 0.05
+  type: aleatory
+Variable 3:
+  name: a3
+  distribution: normal
+  mean: 1.0
+  stdev: 0.10
+  type: aleatory
+
+Settings:
+  order: 2
+  backend: Agg
+  significance: 0.05
+  track_convergence_off: True
