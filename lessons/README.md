@@ -42,6 +42,31 @@ active (`conda activate eng-des-opt-course`; see the top-level [README](../READM
    python lessons/lesson_03_gradient_based_optimization/generate_xdsm.py  # -> outputs/*.pdf/.png
    ```
 
+4. **[Surrogate modeling](lesson_04_surrogate_modeling/docs/lesson_04_surrogate_modeling.md)**
+   — replace the analytic Sellar disciplines with surrogates trained from a Design
+   of Experiments (full-factorial / random / LHS), fit with SMT (QP / RBF / Kriging),
+   judged with held-out R²/RMSE, cross-validation, and learning curves, then dropped
+   back into the Lesson-3 MDA + optimizer. Needs `smt` (in the core install).
+   ```bash
+   python lessons/lesson_04_surrogate_modeling/01_doe_sampling.py
+   python lessons/lesson_04_surrogate_modeling/02_fit_surrogates.py
+   python lessons/lesson_04_surrogate_modeling/03_surrogate_mda_opt.py
+   python lessons/lesson_04_surrogate_modeling/generate_xdsm.py  # -> outputs/*.pdf/.png
+   ```
+
+5. **[Uncertainty quantification](lesson_05_uncertainty_quantification/docs/lesson_05_uncertainty_quantification.md)**
+   — make Sellar parameters random; propagate with Monte Carlo and NASA's UQPCE
+   polynomial chaos; read off output distributions, confidence intervals, and Sobol
+   indices; then reformulate to a robust optimization (`min E[obj]` s.t.
+   `CI_lower(g) ≥ 0`). Scripts 3–4 need the `uqpce` extra (`pip install -e .[uq]`).
+   ```bash
+   python lessons/lesson_05_uncertainty_quantification/01_distributions.py
+   python lessons/lesson_05_uncertainty_quantification/02_forward_uq_montecarlo.py
+   python lessons/lesson_05_uncertainty_quantification/03_pce_uqpce.py           # needs uqpce
+   python lessons/lesson_05_uncertainty_quantification/04_robust_optimization.py # needs uqpce
+   python lessons/lesson_05_uncertainty_quantification/generate_xdsm.py  # -> outputs/*.pdf/.png
+   ```
+
 Each lesson has a `docs/` narrative, runnable scripts, and committed `outputs/` so
 the figures render on GitHub without re-running anything. Rendering the XDSM to
 PDF/PNG additionally needs `pdflatex` and `pdftoppm` on PATH.
