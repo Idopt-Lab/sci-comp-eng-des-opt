@@ -13,8 +13,8 @@ style of NASA's UQPCE Sellar example.
     Objective:     obj = x^2 + z2 + a3*y1 + exp(-y2)
     Constraints:   g1 = 3.16 - y1 <= 0,   g2 = y2 - 24 <= 0     (classic Sellar)
 
-with ``a0 ~ N(1, 0.06)``, ``a1 ~ U(0.9, 1.2)``... actually ``a1 ~ U(0.9, 1.1)``,
-``a2 ~ N(1, 0.05)``, ``a3 ~ N(1, 0.10)``. The factors are attached to terms that are
+with ``a0 ~ N(1, 0.06)``, ``a1 ~ U(0.9, 1.1)``, ``a2 ~ N(1, 0.05)``,
+``a3 ~ N(1, 0.10)``. The factors are attached to terms that are
 *non-zero at the optimum* (``z1``, ``sqrt(y1)``, ``y1``) so every one of them
 actually influences the response there.
 
