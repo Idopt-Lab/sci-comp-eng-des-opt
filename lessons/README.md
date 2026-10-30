@@ -58,7 +58,7 @@ active (`conda activate eng-des-opt-course`; see the top-level [README](../READM
    — make Sellar parameters random; propagate with Monte Carlo and NASA's UQPCE
    polynomial chaos; read off output distributions, confidence intervals, and Sobol
    indices; then reformulate to a robust optimization (`min E[obj]` s.t.
-   `CI_lower(g) ≥ 0`). Scripts 3–4 need the `uqpce` extra (`pip install -e .[uq]`).
+   `CI_upper(g) ≤ 0`). Scripts 3–4 need the `uqpce` extra (`pip install -e .[uq]`).
    ```bash
    python lessons/lesson_05_uncertainty_quantification/01_distributions.py
    python lessons/lesson_05_uncertainty_quantification/02_forward_uq_montecarlo.py

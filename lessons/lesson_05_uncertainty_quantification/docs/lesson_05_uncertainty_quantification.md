@@ -67,6 +67,39 @@ the coefficients and samples the cheap surrogate for the rest — the same stati
 for ~1000× fewer true model runs, which is what makes UQ affordable *inside* an
 optimizer.
 
+## What is fixed and what is sampled (MDA vs. MDO)
+
+Scripts 2 and 3 are **forward UQ of one fixed design**, not optimization under
+uncertainty. Both follow the same three steps:
+
+1. **Optimize once, deterministically.** `deterministic_optimum()` runs SLSQP with every
+   factor at its mean (`a_i = 1`, i.e. classic Sellar) and returns `z ≈ (1.9776, 0)`,
+   `x ≈ 0`. This is the only optimization in scripts 2–3.
+2. **Freeze that design.** For every sample of `(a0, a1, a2, a3)`, solve only the
+   coupled **MDA** (`y1 ↔ y2`; `solve_mda`, vectorized fixed-point iteration) at the
+   frozen `z`, `x`. Each sample is an MDA solve — nothing is re-optimized per sample.
+3. **Collect statistics** of `obj`, `g1`, `g2` over the samples.
+
+| Script | Design `z`, `x` | Samples of `a0..a3` | True MDA solves |
+|---|---|---|---|
+| 2 — Monte Carlo | fixed at the deterministic optimum | 100,000 random draws | 100,000 (+ 6 × 30,000 for the Sobol indices) |
+| 3 — PCE (UQPCE) | fixed at the same deterministic optimum | 60 UQPCE collocation points (`run_matrix.dat`) | 60 to fit the PCE; the fitted PCE is then sampled 100,000 times (cheap), and 100,000 true MDA solves on the same draws serve only as the reference |
+| 4 — robust opt. | **free** — SLSQP moves it | the same 60 collocation points, at every iteration | 60 per optimizer iteration |
+
+So scripts 2–3 answer *"how does the design we built while ignoring the scatter behave
+once the inputs scatter?"* — and the answer (`g1` violated ~50% of the time) motivates
+script 4. MDO and UQ are combined only in **script 4**: the design variables are
+free, and at every optimizer iteration the MDA is solved at all 60 collocation points
+at once (`SellarMDA(vec_size=60)`), UQPCE turns those responses into `obj:mean` and
+`con:ci_upper`, and SLSQP optimizes on those statistics. The XDSMs show the same split:
+`sellar_forward_uq.*` takes `z, x` as a fixed input and has no optimizer;
+`sellar_robust_opt.*` wraps the UQPCE group in one.
+
+None of the scripts **re-optimizes for each sample** of `a`. That would give the
+scatter of the *optimal design* — how the best design would move if `a` were known
+before designing — which is a different question from how one built design performs
+under scatter.
+
 ## Terminology cheat sheet
 
 - **Aleatory** uncertainty — irreducible randomness, modeled with a distribution.
