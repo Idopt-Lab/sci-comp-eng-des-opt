@@ -48,9 +48,9 @@ Conceptual Approach*.
 
 **Prerequisites & tools.** Working Python, plus graduate-level familiarity with
 your own research domain. The hands-on work uses this repository's
-`eng-des-opt-course` environment (OpenMDAO, JAX, Streamlit); see the
-[Quickstart](#quickstart-run-the-asw-streamlit-example) below. Additional tools
-introduced during the term: SMT, UM-Bridge, and VT-ARC HPC.
+`eng-des-opt-course` environment (OpenMDAO, JAX, SMT, NASA's UQPCE, Streamlit); see
+the [Quickstart](#quickstart-run-the-asw-streamlit-example) below. Additional tools
+introduced during the term: UM-Bridge and VT-ARC HPC.
 
 ## Course schedule — Fall 2026
 
@@ -67,7 +67,7 @@ arranged. Chapter numbers refer to Martins & Ning.
 | 2 | Sep 14 | **Iterative methods** — fixed-point (Gauss–Seidel), Newton, Broyden; convergence and cost | **N2 diagram** of your MDO problem | Ch. 3, App. B–C; [Lesson 2 — Iterative methods](lessons/lesson_02_iterative_methods/asw/docs/lesson_02_iterative_methods.md) |
 | 3 | Sep 28 | **Gradient-based optimization & computing derivatives** — line search, BFGS, SQP; finite difference, complex step, JAX AD, adjoint | First runnable **JAX + OpenMDAO** script (agentic AI workflow) | Ch. 4–6; [Lesson 3 — Gradient-based optimization](lessons/lesson_03_gradient_based_optimization/docs/lesson_03_gradient_based_optimization.md); [ex_05 — C172 trim](src/aircraft_sizing/examples/ex_05_c172_trim/docs/ex_05_c172_trim.md) |
 | 4 | Oct 12 | **Mid-semester presentations** — project-idea pitch | **Pitch**: problem statement, N2, and planned approach (incl. uncertainty sources / k-factors) | — |
-| 5 | Oct 26 | **Surrogate-based optimization & optimization under uncertainty** — surrogate modeling with SMT; UQ with UM-Bridge; robust / reliability-based design | Design of experiments + **data set on VT-ARC HPC** | Ch. 10, 12 |
+| 5 | Oct 26 | **Surrogate-based optimization & optimization under uncertainty** — surrogate modeling with SMT; UQ with UM-Bridge; robust / reliability-based design | Design of experiments + **data set on VT-ARC HPC** | Ch. 10, 12; [Lesson 4 — Surrogate modeling](lessons/lesson_04_surrogate_modeling/docs/lesson_04_surrogate_modeling.md); [Lesson 5 — Uncertainty quantification](lessons/lesson_05_uncertainty_quantification/docs/lesson_05_uncertainty_quantification.md) |
 | 6 | Nov 9 | **Gradient-free & multi-objective optimization** — Nelder–Mead, genetic algorithms, particle swarm; Pareto fronts, weighted-sum and ε-constraint | Fitted **SMT surrogate** + **UM-Bridge UQ results** | Ch. 7, 9; [ex_05 — C172 trim](src/aircraft_sizing/examples/ex_05_c172_trim/docs/ex_05_c172_trim.md) (pymoo GA solver) |
 | 7 | Dec 7 | **Final presentations** | **Final report + presentation** | — |
 
@@ -83,7 +83,7 @@ Follow these steps to create a Conda environment, install the package into it, a
 ### 1. Get the code
 
 ```bash
-git clone https://github.com/<your-account>/sci-comp-eng-des-opt.git
+git clone https://github.com/Idopt-Lab/sci-comp-eng-des-opt.git
 cd sci-comp-eng-des-opt
 ```
 
@@ -103,7 +103,13 @@ From the repository root:
 conda env create -f environment.yml --yes
 ```
 
-`environment.yml` creates an environment named **`eng-des-opt-course`** (Python 3.12) and installs this package in editable mode with the extra derivative backends for the ex_05 C172 trim example (`-e .[trim,csdl]` — CasADi, Warp, pymoo, pandas, and CSDL-alpha), so the environment picks up local source edits automatically. Warp reaches an NVIDIA GPU on native Windows through its bundled CUDA runtime (just the driver is needed); JAX stays on CPU on Windows. To add the extras to an existing install: `python -m pip install -e ".[trim,csdl]"`.
+`environment.yml` creates an environment named **`eng-des-opt-course`** (Python 3.12) and installs this package in editable mode with all optional extras (`-e .[trim,csdl,uq]`), so the environment picks up local source edits automatically. The core install includes SMT (Lesson 4 surrogates); the extras add:
+
+- `trim` — CasADi, Warp, pymoo, and pandas (derivative backends and GA for the ex_05 C172 trim example)
+- `csdl` — the CSDL-alpha backend for ex_05 (installed from GitHub)
+- `uq` — NASA's UQPCE polynomial chaos for Lesson 5 (installed from GitHub)
+
+Warp reaches an NVIDIA GPU on native Windows through its bundled CUDA runtime (just the driver is needed); JAX stays on CPU on Windows. To add the extras to an existing install: `python -m pip install -e ".[trim,csdl,uq]"`.
 
 ### 3. Activate the environment
 
@@ -158,8 +164,18 @@ Cruise altitude drives the ICAO standard atmosphere — speed of sound, density,
 If you change package metadata or dependencies, refresh the editable install (with the environment active):
 
 ```bash
-python -m pip install -e .
+python -m pip install -e ".[trim,csdl,uq]"
 ```
+
+## Running the tests
+
+From the repository root, with the environment active:
+
+```bash
+python -m pytest lessons src
+```
+
+The lesson tests live in per-lesson packages (`lessons/lesson_0N_*/tests_lesson_0N/`) and the example tests in `src/aircraft_sizing/examples/ex_*/tests/`. Tests that need an optional extra (e.g. `uqpce`, CasADi, CSDL) skip automatically if it is not installed. Several lesson tests run the lesson scripts end to end, so the full suite takes a few minutes.
 
 ## Canonical course documents
 
@@ -178,7 +194,10 @@ python -m pip install -e .
 
 - [Lesson 1 — Design Structure Matrices (DSM), N2, and XDSM](lessons/lesson_01_dsm/docs/lesson_01_dsm.md)
 - [Lesson 2 — Iterative methods: fixed-point vs Newton vs Broyden, gradients vs finite difference](lessons/lesson_02_iterative_methods/asw/docs/lesson_02_iterative_methods.md)
+  - [Sellar MDA walkthrough](lessons/lesson_02_iterative_methods/sellar/docs/sellar_walkthrough.md) (instructor guide: building your first OpenMDAO model)
 - [Lesson 3 — Gradient-based optimization & computing derivatives (analytic / FD / complex-step / AD)](lessons/lesson_03_gradient_based_optimization/docs/lesson_03_gradient_based_optimization.md)
+- [Lesson 4 — Surrogate modeling: DoE, SMT surrogates, validation, surrogate-based optimization](lessons/lesson_04_surrogate_modeling/docs/lesson_04_surrogate_modeling.md)
+- [Lesson 5 — Uncertainty quantification: Monte Carlo, polynomial chaos (UQPCE), robust optimization](lessons/lesson_05_uncertainty_quantification/docs/lesson_05_uncertainty_quantification.md)
 
 ### Reference notes
 

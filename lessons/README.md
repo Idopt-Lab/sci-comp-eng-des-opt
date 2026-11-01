@@ -1,10 +1,11 @@
 # Course lessons
 
 Hands-on lessons in scientific-computing methods for engineering design
-optimization. Every lesson uses the same shared model — the OpenMDAO + JAX ASW
-conceptual-sizing example in
-[`src/aircraft_sizing/examples/ex_01_asw`](../src/aircraft_sizing/examples/ex_01_asw) —
-so the ideas build on one concrete artifact instead of a new toy each time.
+optimization. The lessons build on two recurring models instead of a new toy each
+time: the OpenMDAO + JAX ASW conceptual-sizing example in
+[`src/aircraft_sizing/examples/ex_01_asw`](../src/aircraft_sizing/examples/ex_01_asw)
+(Lessons 1–3), and the two-discipline Sellar MDA, introduced in Lesson 2 and carried
+through optimization (Lesson 3), surrogates (Lesson 4), and UQ (Lesson 5).
 
 Run all commands from the repository root with the `eng-des-opt-course` environment
 active (`conda activate eng-des-opt-course`; see the top-level [README](../README.md)).
@@ -24,7 +25,10 @@ active (`conda activate eng-des-opt-course`; see the top-level [README](../READM
 2. **[Iterative methods](lesson_02_iterative_methods/asw/docs/lesson_02_iterative_methods.md)**
    — fixed point vs Newton vs Broyden, counting iterations and
    function/derivative evaluations; analytic (JAX) gradients vs finite difference.
+   Opens with the [Sellar MDA walkthrough](lesson_02_iterative_methods/sellar/docs/sellar_walkthrough.md)
+   (build your first OpenMDAO model live; step-by-step snapshots in `sellar/steps/`).
    ```bash
+   python lessons/lesson_02_iterative_methods/sellar/sellar_mda.py  # -> sellar/outputs/sellar_n2.html
    python lessons/lesson_02_iterative_methods/asw/compare_solvers.py
    # -> outputs/solver_comparison.md, outputs/convergence.png
    ```
@@ -70,3 +74,15 @@ active (`conda activate eng-des-opt-course`; see the top-level [README](../READM
 Each lesson has a `docs/` narrative, runnable scripts, and committed `outputs/` so
 the figures render on GitHub without re-running anything. Rendering the XDSM to
 PDF/PNG additionally needs `pdflatex` and `pdftoppm` on PATH.
+
+## Tests
+
+Lessons 3–5 have smoke/acceptance tests in uniquely named packages
+(`tests_lesson_03/`, `tests_lesson_04/`, `tests_lesson_05/`), so they can all be
+collected in one run:
+
+```bash
+python -m pytest lessons
+```
+
+The Lesson 5 UQPCE tests skip automatically if the `uq` extra is not installed.
