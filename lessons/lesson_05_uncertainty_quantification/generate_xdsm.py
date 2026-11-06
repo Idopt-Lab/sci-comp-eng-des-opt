@@ -3,9 +3,9 @@
 Produces two diagrams in ``outputs/``:
 
 * ``sellar_forward_uq`` -- forward propagation: a UQ sampler (Monte Carlo or the
-  PCE collocation design) evaluates the stacked uncertain Sellar MDA across draws
-  of ``a0..a3`` and a statistics box rolls the responses up into ``E[.]`` and
-  ``sigma[.]``;
+  PCE collocation design) draws ``a0..a3``; ``a0..a2`` go into the stacked uncertain
+  Sellar MDA, ``a3`` only into the stacked objective/constraint box, and a statistics
+  box rolls the responses up into ``E[.]`` and ``sigma[.]``;
 * ``sellar_robust_opt`` -- the robust architecture: an optimizer wrapped around a
   UQPCE group (which hides the MDA + polynomial chaos) whose feedback edge carries
   the *statistical* objective/constraints (``E[obj]``, ``CI_upper(g)``).
@@ -45,22 +45,30 @@ def _pyxdsm_api():
 
 
 def build_forward_uq(api):
-    """Forward UQ: sampler -> stacked uncertain MDA -> statistics."""
+    """Forward UQ: sampler -> stacked MDA -> stacked obj/constraints -> statistics.
+
+    ``a0..a2`` enter the MDA residuals; ``a3`` only scales ``y1`` in the objective, so
+    it bypasses the MDA and goes straight to the objective/constraint box.
+    """
     XDSM, DOE, GROUP, FUNC, RIGHT = (
         api["XDSM"], api["DOE"], api["GROUP"], api["FUNC"], api["RIGHT"]
     )
     x = XDSM(use_sfmath=False)
     x.add_system("uq", DOE, (r"\text{UQ sampler}", r"\text{(MC / PCE)}"))
     x.add_system("mda", GROUP, (r"\text{Sellar MDA}",), stack=True)
+    x.add_system("func", FUNC, (r"\text{Objective and}", r"\text{constraints}"), stack=True)
     x.add_system("stats", FUNC, (r"\text{Statistics}",))
 
     x.add_input("uq", r"p(a_0),\ \ldots,\ p(a_3)")
     x.add_input("mda", r"z,\ x")
-    x.connect("uq", "mda", r"a^{(i)}", stack=True)
-    x.connect("mda", "stats", r"\mathrm{obj}^{(i)},\ g^{(i)}", stack=True)
+    x.add_input("func", r"z_2,\ x")
+    x.connect("uq", "mda", r"a_0^{(i)},\ a_1^{(i)},\ a_2^{(i)}", stack=True)
+    x.connect("uq", "func", r"a_3^{(i)}", stack=True)
+    x.connect("mda", "func", r"y_1^{(i)},\ y_2^{(i)}", stack=True)
+    x.connect("func", "stats", r"\mathrm{obj}^{(i)},\ g^{(i)}", stack=True)
     x.add_output("stats", r"\mathbb{E}[\cdot],\ \sigma[\cdot]", side=RIGHT)
 
-    x.add_process(["uq", "mda", "stats"], arrow=True)
+    x.add_process(["uq", "mda", "func", "stats"], arrow=True)
     return x
 
 
@@ -69,7 +77,7 @@ def build_robust_opt(api):
     XDSM, OPT, GROUP, RIGHT = api["XDSM"], api["OPT"], api["GROUP"], api["RIGHT"]
     x = XDSM(use_sfmath=False)
     x.add_system("opt", OPT, (r"\text{Optimizer}",))
-    x.add_system("uqpce", GROUP, (r"\text{UQPCE group}", r"\text{(MDA + PCE)}"))
+    x.add_system("uqpce", GROUP, (r"\text{UQPCE group}", r"\text{(MDA, obj/con, PCE)}"))
 
     x.add_input("opt", r"z^{(0)},\ x^{(0)}")
     x.add_input("uqpce", r"p(a_0),\ \ldots,\ p(a_3)")

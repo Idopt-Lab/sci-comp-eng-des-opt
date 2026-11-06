@@ -16,7 +16,9 @@ style of NASA's UQPCE Sellar example.
 with ``a0 ~ N(1, 0.06)``, ``a1 ~ U(0.9, 1.1)``, ``a2 ~ N(1, 0.05)``,
 ``a3 ~ N(1, 0.10)``. The factors are attached to terms that are
 *non-zero at the optimum* (``z1``, ``sqrt(y1)``, ``y1``) so every one of them
-actually influences the response there.
+actually influences the response there. ``a0``, ``a1``, ``a2`` enter the coupled MDA
+residuals; ``a3`` enters only the objective, *after* the MDA, so it scatters ``obj``
+but has no effect on ``y1``, ``y2``, ``g1``, ``g2``.
 
 At the deterministic optimum ``g1`` is active (``y1 = 3.16``), so once ``a0`` scatters
 ``y1`` the constraint is violated about half the time - the motivation for the robust
